@@ -36,13 +36,19 @@ if ($AllowUpdateFromGit) {
     $arguments += '--allow-update-from-git'
 }
 
+$pushedLocation = $false
 try {
+    Push-Location (Split-Path $PSScriptRoot -Parent)
+    $pushedLocation = $true
     & python @arguments
     if ($LASTEXITCODE -ne 0) {
         throw "Fabric Git setup exited with code $LASTEXITCODE"
     }
 }
 finally {
+    if ($pushedLocation) {
+        Pop-Location
+    }
     Remove-Item Env:\GITHUB_PAT -ErrorAction SilentlyContinue
     if ($null -ne $securePat) {
         $securePat.Dispose()
