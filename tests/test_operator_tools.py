@@ -22,6 +22,11 @@ def test_github_pat_accepts_fine_grained_shape(monkeypatch: pytest.MonkeyPatch) 
     assert github_pat().startswith("github_pat_")
 
 
+def test_github_pat_accepts_future_pat_shape(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("GITHUB_PAT", "future_pat_format_with_enough_length")
+    assert github_pat() == "future_pat_format_with_enough_length"
+
+
 def test_connection_url_reads_named_parameter() -> None:
     connection = {
         "connectionDetails": {

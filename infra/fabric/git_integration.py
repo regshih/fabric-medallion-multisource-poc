@@ -28,10 +28,15 @@ def required(name: str) -> str:
 def github_pat() -> str:
     """Return a GitHub PAT, rejecting GitHub CLI OAuth/app tokens early."""
     token = required("GITHUB_PAT")
-    if not token.startswith(("ghp_", "github_pat_")):
+    if token.startswith(("gho_", "ghu_", "ghs_", "ghr_")):
         raise RuntimeError(
-            "GITHUB_PAT must be a GitHub classic or fine-grained personal access token; "
-            "the OAuth token returned by `gh auth token` is not accepted by Fabric"
+            "GITHUB_PAT is a GitHub OAuth, user-to-server, app, or refresh token. Fabric "
+            "requires a classic or fine-grained personal access token."
+        )
+    if len(token) < 20:
+        raise RuntimeError(
+            "GITHUB_PAT is too short to be a generated GitHub personal access token. "
+            "Copy the token value, not its name or masked placeholder."
         )
     return token
 
