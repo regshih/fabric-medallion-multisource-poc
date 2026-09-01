@@ -50,6 +50,8 @@ def test_deploy_binds_all_environment_ids_at_deploy_time(tmp_path, monkeypatch):
     monkeypatch.setenv("FABRIC_CAPACITY_NAME", "shared-capacity")
     monkeypatch.setenv("FABRIC_DATABRICKS_MIRROR_NAME", "db-mirror")
     monkeypatch.setenv("FABRIC_COSMOS_MIRROR_NAME", "cosmos-mirror")
+    monkeypatch.setenv("DATABRICKS_SCHEMA", "banking_source")
+    monkeypatch.setenv("COSMOS_DATABASE_NAME", "banking_poc")
     api = FakeClient()
     result = deploy(api, root=tmp_path)
 

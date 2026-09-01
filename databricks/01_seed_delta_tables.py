@@ -2,7 +2,8 @@
 """Create deterministic synthetic source tables in Unity Catalog.
 
 Attach this notebook to a Unity Catalog-enabled cluster or serverless compute.
-It uses only managed tables and contains no credentials or storage locations.
+It writes external Delta tables to a deployment-supplied Unity Catalog external
+location so Fabric can consume a Delta protocol without ``catalogManaged``.
 """
 
 # COMMAND ----------
@@ -14,6 +15,7 @@ dbutils.widgets.text("schema", "banking_source", "Schema")
 dbutils.widgets.text("row_count", "500000", "Transaction rows")
 dbutils.widgets.text("customer_count", "50000", "Customers")
 dbutils.widgets.text("merchant_count", "5000", "Merchants")
+dbutils.widgets.text("external_root", "", "External Delta root (abfss URL)")
 dbutils.widgets.dropdown("create_catalog", "false", ["false", "true"], "Create catalog")
 
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,254}$")
@@ -32,10 +34,13 @@ schema = identifier(schema_raw)
 row_count = int(dbutils.widgets.get("row_count"))
 customer_count = int(dbutils.widgets.get("customer_count"))
 merchant_count = int(dbutils.widgets.get("merchant_count"))
+external_root = dbutils.widgets.get("external_root").strip().rstrip("/")
 if not (1 <= row_count <= 100_000_000):
     raise ValueError("row_count must be between 1 and 100,000,000")
 if min(customer_count, merchant_count) < 1:
     raise ValueError("customer_count and merchant_count must be positive")
+if not re.fullmatch(r"abfss://[A-Za-z0-9-]+@[A-Za-z0-9.-]+(?:/[A-Za-z0-9._/-]*)?", external_root):
+    raise ValueError("external_root must be a safe abfss URL supplied at deployment")
 
 if dbutils.widgets.get("create_catalog") == "true":
     spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
@@ -47,13 +52,13 @@ def target(table: str) -> str:
 
 
 def save_initial(df, table: str) -> None:
-    """Atomically replace only the deterministic initial partition."""
+    """Replace the deterministic external Delta table and register it in UC."""
     name = target(table)
-    if not spark.catalog.tableExists(f"{catalog_raw}.{schema_raw}.{table}"):
-        (df.write.format("delta").partitionBy("SourceBatch").saveAsTable(name))
-    else:
-        (df.write.format("delta").mode("overwrite")
-         .option("replaceWhere", "SourceBatch = 'initial'").saveAsTable(name))
+    location = f"{external_root}/{catalog_raw}/{schema_raw}/{table}"
+    (df.write.format("delta").mode("overwrite").option("overwriteSchema", "true")
+     .partitionBy("SourceBatch").save(location))
+    spark.sql(f"DROP TABLE IF EXISTS {name}")
+    spark.sql(f"CREATE TABLE {name} USING DELTA LOCATION '{location}'")
     spark.sql(f"ALTER TABLE {name} SET TBLPROPERTIES (delta.enableChangeDataFeed = true)")
 
 

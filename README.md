@@ -11,22 +11,22 @@ Both are treated as source-aligned Bronze access. The POC does not create a dupl
 
 ## Evidence status
 
-Status is deliberately separated into local implementation, deployed infrastructure, and end-to-end verification. As of 2026-08-31:
+Status is deliberately separated into local implementation, deployed infrastructure, and end-to-end verification. As of 2026-09-01:
 
 | Area | Current evidence |
 |---|---|
-| Repository implementation | Implemented; 39 local tests pass |
+| Repository implementation | Implemented; 47 local tests pass |
 | Azure resource group | Deployed |
 | Azure Databricks workspace | Premium workspace deployed |
-| Databricks seed | Job running; output tables and counts not yet verified |
-| Databricks external access | Blocked: enabling metastore external access requires a metastore admin |
+| Databricks source | Three external Unity Catalog Delta tables verified at 500,000 transactions, 500,000 risk rows, and 5,000 merchants |
+| Databricks Fabric mirror | Running with automatic metadata sync and three working zero-copy shortcuts |
 | Azure Cosmos DB | Serverless account, `Continuous7Days` backup, database, and three containers deployed |
-| Cosmos network path | Blocked: public networking is disabled by tenant policy; private-network configuration is underway |
+| Cosmos network path | Private endpoint plus Fabric VNet data gateway verified; public fallback wasn't used |
 | Fabric | Workspace deployed on a reused F4 capacity |
-| Fabric items and source mirrors | Not yet verified |
-| Pipeline, notebooks, Warehouse execution | Implemented locally; not yet executed or verified in Fabric |
-| Fabric Git and governance | Automation implemented locally; connection/policies/catalog discovery not yet verified |
-| End-to-end and incremental run | Not yet verified |
+| Fabric items and source mirrors | Deployed and verified in the dedicated POC workspace |
+| Pipeline, notebooks, Warehouse execution | Baseline run completed; all reconciliation checks pass; Warehouse RLS/DDM deployed |
+| Fabric Git and governance | Catalog descriptions, discovery, OneLake role, Warehouse RLS/DDM verified; Fabric Git and Viewer-context enforcement remain |
+| End-to-end and incremental run | Verified; baseline and incremental runs completed with all seven reconciliations passing |
 
 Nothing in this table should be interpreted as a successful Fabric workload run until the validation evidence in [docs/validation.md](docs/validation.md) is completed.
 
@@ -49,7 +49,7 @@ Gold also contains:
 | `databricks/` | Initial and incremental Unity Catalog Delta jobs |
 | `cosmos/` | Passwordless initial and incremental document loaders |
 | `infra/cosmos/` | Cosmos DB Bicep and deployment wrapper |
-| `infra/fabric/` | Fabric REST deployment and F-capacity controls |
+| `infra/fabric/` | Fabric REST source mirrors, workspace/items, Git integration, and F-capacity controls |
 | `infra/governance/` | Catalog descriptions/search, domain assignment, OneLake security |
 | `notebooks/` | Source validation, Silver, Gold, Warehouse, reconciliation, audit, demo |
 | `pipelines/` | `pl_multisource_medallion` definition with success/failure paths |
@@ -84,6 +84,7 @@ All records are deterministic synthetic test data. No production data or real-pe
 - [Deployment guide](docs/deployment.md)
 - [Operations runbook, cost, and cleanup](docs/runbook.md)
 - [Validation and evidence checklist](docs/validation.md)
+- [Live validation results](docs/live-validation-results.md)
 - [Governance and security model](docs/governance-security.md)
 - [Known limitations](docs/known-limitations.md)
 
@@ -99,4 +100,3 @@ Product behaviors in this repository are based on current Microsoft documentatio
 - [Azure Cosmos DB mirroring limitations](https://learn.microsoft.com/en-us/fabric/mirroring/azure-cosmos-db-limitations)
 - [OneLake security](https://learn.microsoft.com/en-us/fabric/onelake/security/fabric-onelake-security)
 - [OneLake catalog](https://learn.microsoft.com/en-us/fabric/governance/onelake-catalog-overview)
-

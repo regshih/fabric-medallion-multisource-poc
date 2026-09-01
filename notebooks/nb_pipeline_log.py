@@ -1,6 +1,15 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 pipeline_run_id = "manual"
 run_date = ""
 stage = "pipeline"
@@ -10,7 +19,15 @@ raise_after_log = False
 workspace_id = ""
 audit_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 """Idempotent success/failure logger used by pipeline dependency paths."""
 from datetime import datetime, timezone
 from delta.tables import DeltaTable
@@ -45,3 +62,9 @@ should_raise = raise_after_log if isinstance(raise_after_log, bool) else str(rai
 if should_raise:
     raise RuntimeError(error_message or f"Pipeline stage '{stage}' reported result '{result}'")
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

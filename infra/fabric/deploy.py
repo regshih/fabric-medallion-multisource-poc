@@ -73,13 +73,20 @@ def load_notebooks(directory: Path = ROOT / "notebooks") -> dict[str, str]:
 def source_item_ids(client: FabricClient, workspace_id: str) -> dict[str, str]:
     """Resolve preconfigured mirrored source items by name, regardless of mirror subtype."""
     requested = {
-        "databricks_source": required_env("FABRIC_DATABRICKS_MIRROR_NAME"),
-        "cosmos_source": required_env("FABRIC_COSMOS_MIRROR_NAME"),
+        "databricks_source": (
+            required_env("FABRIC_DATABRICKS_MIRROR_NAME"),
+            "MirroredAzureDatabricksCatalog",
+        ),
+        "cosmos_source": (required_env("FABRIC_COSMOS_MIRROR_NAME"), "MirroredDatabase"),
     }
     visible = client.items(workspace_id)
     result: dict[str, str] = {}
-    for key, display_name in requested.items():
-        matches = [item for item in visible if item.get("displayName") == display_name]
+    for key, (display_name, item_type) in requested.items():
+        matches = [
+            item
+            for item in visible
+            if item.get("displayName") == display_name and item.get("type") == item_type
+        ]
         if len(matches) != 1:
             raise FabricApiError(
                 f"Expected exactly one Fabric source item named {display_name!r}; found {len(matches)}"
@@ -104,6 +111,8 @@ def deploy(client: FabricClient, *, root: Path = ROOT) -> dict[str, Any]:
         "silver_lh": os.getenv("FABRIC_SILVER_LAKEHOUSE_NAME", "silver_lh"),
         "gold_lh": os.getenv("FABRIC_GOLD_LAKEHOUSE_NAME", "gold_lh"),
         "gold_wh": os.getenv("FABRIC_WAREHOUSE_NAME", "gold_wh"),
+        "databricks_schema": required_env("DATABRICKS_SCHEMA"),
+        "cosmos_schema": required_env("COSMOS_DATABASE_NAME"),
     }
     items: dict[str, str] = {}
     for key in ("silver_lh", "gold_lh"):

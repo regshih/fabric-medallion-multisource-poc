@@ -1,6 +1,15 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 # Values are supplied by the deployment pipeline. Empty defaults are deliberate:
 # no tenant-specific identifiers or credentials belong in source control.
 pipeline_run_id = "manual"
@@ -8,17 +17,26 @@ run_date = ""
 source = "all"  # Pipeline branches pass "databricks" or "cosmos".
 workspace_id = ""
 databricks_source_lakehouse_id = ""
+databricks_source_schema = ""
 cosmos_source_lakehouse_id = ""
+cosmos_source_schema = ""
 audit_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 from datetime import datetime, timezone
 from delta.tables import DeltaTable
 from pyspark.sql import Row
 from pyspark.sql import functions as F
 from pyspark.sql.types import LongType, StringType, StructField, StructType, TimestampType
 
-STAGE = "source_validation"
 _started = datetime.now(timezone.utc)
 
 
@@ -29,17 +47,22 @@ def _required(name, value):
 
 if source.lower() not in {"all", "databricks", "cosmos"}:
     raise ValueError("source must be one of: all, databricks, cosmos")
+source = source.lower()
+STAGE = f"source_validation_{source}"
 
 for _name in ("workspace_id", "audit_lakehouse_id"):
     _required(_name, globals()[_name])
-if source.lower() in {"all", "databricks"}:
+if source in {"all", "databricks"}:
     _required("databricks_source_lakehouse_id", databricks_source_lakehouse_id)
-if source.lower() in {"all", "cosmos"}:
+    _required("databricks_source_schema", databricks_source_schema)
+if source in {"all", "cosmos"}:
     _required("cosmos_source_lakehouse_id", cosmos_source_lakehouse_id)
+    _required("cosmos_source_schema", cosmos_source_schema)
 
 
-def table_path(lakehouse_id, table_name):
-    return f"abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/{table_name}"
+def table_path(lakehouse_id, table_name, schema_name=""):
+    object_path = f"{schema_name}/{table_name}" if schema_name else table_name
+    return f"abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/{object_path}"
 
 
 AUDIT_SCHEMA = StructType([
@@ -68,12 +91,12 @@ def write_audit(status, rows_read=0, rows_written=0, error_message=None):
 
 
 EXPECTED = {
-    "databricks": (databricks_source_lakehouse_id, {
+    "databricks": (databricks_source_lakehouse_id, databricks_source_schema, {
         "transactions": {"TransactionID", "CustomerID", "AccountID", "MerchantID", "TransactionTimestamp", "Amount"},
         "transaction_risk": {"TransactionID", "RiskScore", "RiskBand", "ScoredTimestamp"},
         "merchants": {"MerchantID", "MerchantName", "MerchantRiskCategory"},
     }),
-    "cosmos": (cosmos_source_lakehouse_id, {
+    "cosmos": (cosmos_source_lakehouse_id, cosmos_source_schema, {
         "digitalSessions": {"sessionId", "customerId", "device", "loginTimestamp", "authentication"},
         "devices": {"deviceId", "customerId", "trusted", "operatingSystem"},
         "fraudAlerts": {"alertId", "customerId", "createdTimestamp", "severity", "status"},
@@ -83,11 +106,11 @@ EXPECTED = {
 results = []
 total_rows = 0
 try:
-    selected_sources = EXPECTED if source.lower() == "all" else {source.lower(): EXPECTED[source.lower()]}
-    for source_name, (lakehouse_id, tables) in selected_sources.items():
+    selected_sources = EXPECTED if source == "all" else {source: EXPECTED[source]}
+    for source_name, (lakehouse_id, schema_name, tables) in selected_sources.items():
         for object_name, expected_columns in tables.items():
             try:
-                df = spark.read.format("delta").load(table_path(lakehouse_id, object_name))
+                df = spark.read.format("delta").load(table_path(lakehouse_id, object_name, schema_name))
                 count = df.count()
                 missing = sorted(expected_columns - set(df.columns))
                 status = "PASS" if not missing else "FAIL"
@@ -116,3 +139,10 @@ try:
 except Exception as exc:
     write_audit("Failed", total_rows, len(results), str(exc)[:2000])
     raise
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

@@ -149,7 +149,7 @@ class FabricClient:
             if status in TERMINAL_SUCCESS:
                 result_url = last.get("resultUrl") or poll.headers.get("Location")
                 if not result_url:
-                    result_url = f"{location.rstrip('/')}/result"
+                    return last
                 result = self.request("GET", str(result_url))
                 return self._json(result) or last
             delay = _retry_seconds(poll.headers.get("Retry-After"), self.poll_interval)

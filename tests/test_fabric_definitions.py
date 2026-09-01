@@ -42,7 +42,11 @@ def test_pipeline_template_has_no_embedded_guids_and_binding_is_non_mutating():
         "databricks_source": "db-source", "cosmos_source": "cosmos-source",
         "silver_lh": "silver", "gold_lh": "gold", "gold_wh": "warehouse", "audit_lh": "audit",
     }
-    item_names = {"silver_lh": "silver_lh", "gold_lh": "gold_lh", "gold_wh": "gold_wh"}
+    item_names = {
+        "silver_lh": "silver_lh", "gold_lh": "gold_lh", "gold_wh": "gold_wh",
+        "databricks_schema": "banking_source",
+        "cosmos_schema": "banking_poc",
+    }
     bound = bind_pipeline(template, "bound-workspace", ids, item_ids, item_names)
     encoded = json.dumps(bound)
     assert "{{" not in encoded

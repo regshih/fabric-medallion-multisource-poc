@@ -1,15 +1,34 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 pipeline_run_id = "manual"
 run_date = ""
 workspace_id = ""
 databricks_source_lakehouse_id = ""
+databricks_source_schema = ""
 cosmos_source_lakehouse_id = ""
+cosmos_source_schema = ""
 silver_lakehouse_id = ""
 audit_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 from datetime import datetime, timezone
 from delta.tables import DeltaTable
 from pyspark.sql import Row
@@ -22,7 +41,7 @@ _started = datetime.now(timezone.utc)
 
 
 def require_parameters():
-    required = ["workspace_id", "databricks_source_lakehouse_id", "cosmos_source_lakehouse_id",
+    required = ["workspace_id", "databricks_source_lakehouse_id", "databricks_source_schema", "cosmos_source_lakehouse_id", "cosmos_source_schema",
                 "silver_lakehouse_id", "audit_lakehouse_id"]
     missing = [name for name in required if not str(globals()[name]).strip()]
     if missing:
@@ -36,8 +55,9 @@ def path(lakehouse_id, table_name):
     return f"abfss://{workspace_id}@onelake.dfs.fabric.microsoft.com/{lakehouse_id}/Tables/{table_name}"
 
 
-def read_source(lakehouse_id, table_name):
-    return spark.read.format("delta").load(path(lakehouse_id, table_name))
+def read_source(lakehouse_id, table_name, schema_name=""):
+    object_name = f"{schema_name}/{table_name}" if schema_name else table_name
+    return spark.read.format("delta").load(path(lakehouse_id, object_name))
 
 
 def latest(df, keys, order_column):
@@ -95,12 +115,12 @@ def write_audit(status, rows_read, rows_written, error_message=None):
 
 rows_read = rows_written = 0
 try:
-    raw_txn = read_source(databricks_source_lakehouse_id, "transactions")
-    raw_risk = read_source(databricks_source_lakehouse_id, "transaction_risk")
-    raw_merchants = read_source(databricks_source_lakehouse_id, "merchants")
-    raw_sessions = read_source(cosmos_source_lakehouse_id, "digitalSessions")
-    raw_devices = read_source(cosmos_source_lakehouse_id, "devices")
-    raw_alerts = read_source(cosmos_source_lakehouse_id, "fraudAlerts")
+    raw_txn = read_source(databricks_source_lakehouse_id, "transactions", databricks_source_schema)
+    raw_risk = read_source(databricks_source_lakehouse_id, "transaction_risk", databricks_source_schema)
+    raw_merchants = read_source(databricks_source_lakehouse_id, "merchants", databricks_source_schema)
+    raw_sessions = read_source(cosmos_source_lakehouse_id, "digitalSessions", cosmos_source_schema)
+    raw_devices = read_source(cosmos_source_lakehouse_id, "devices", cosmos_source_schema)
+    raw_alerts = read_source(cosmos_source_lakehouse_id, "fraudAlerts", cosmos_source_schema)
     rows_read = sum(df.count() for df in [raw_txn, raw_risk, raw_merchants, raw_sessions, raw_devices, raw_alerts])
 
     transactions = latest(raw_txn, ["TransactionID"], "TransactionTimestamp").select(
@@ -182,3 +202,10 @@ try:
 except Exception as exc:
     write_audit("Failed", rows_read, rows_written, str(exc)[:2000])
     raise
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

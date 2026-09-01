@@ -14,7 +14,7 @@ Copy-Item .env.example .env
 python -m pytest -q
 ```
 
-Expected current local baseline: `39 passed`. A local pass proves definitions and helper behavior; it does not prove Azure or Fabric execution.
+Expected current local baseline: `47 passed`. A local pass proves definitions and helper behavior; it does not prove Azure or Fabric execution.
 
 ## 2. Configure identifiers
 
@@ -45,7 +45,7 @@ python validation\validate_cosmos.py --mode live --endpoint '<cosmos-endpoint>' 
 
 ## 4. Databricks source
 
-Use the deployed Premium workspace and a Unity Catalog-enabled compute/job identity. Import and run `databricks/01_seed_delta_tables.py` with the desired catalog/schema parameters. The initial defaults target 500,000 transactions, 500,000 scores, and 5,000 merchants. Confirm the job has succeeded before proceeding; a running job isn't proof of table creation.
+Use the deployed Premium workspace and a Unity Catalog-enabled compute/job identity. Import and run `databricks/01_seed_delta_tables.py` with the desired catalog/schema parameters and the required `external_root` ABFSS URI (for example, a dedicated path beneath a Unity Catalog external location). The identity running the seed needs access to the corresponding storage credential/external location. The initial defaults target 500,000 transactions, 500,000 scores, and 5,000 merchants. Confirm the job has succeeded and the three objects are external Delta tables before proceeding; a running job isn't proof of table creation.
 
 External data access must be enabled on the metastore by a metastore admin. Then grant the Fabric connection identity the narrow source privileges including `EXTERNAL USE SCHEMA` and only the catalog/schema/table access it needs. Do not grant broad metastore administration to solve the connection.
 
@@ -59,11 +59,12 @@ or run the validation module in a Spark context. Record table schemas/counts and
 
 ## 5. Create source-aligned Fabric items
 
-These two portal operations precede the repository deployment because `infra/fabric/deploy.py` resolves the source items by name.
+Source connection credentials precede the repository deployment because `infra/fabric/deploy.py` resolves the source items by name.
 
-1. Create `databricks_bronze` using **Mirrored Azure Databricks catalog**. Select the configured catalog/schema and exactly `transactions`, `transaction_risk`, and `merchants`. This is metadata sync plus zero-copy shortcuts.
-2. Create `cosmos_bronze` using **Mirrored Azure Cosmos DB**. Select `banking_poc` and exactly `digitalSessions`, `devices`, and `fraudAlerts`. This is continuous physical replication.
-3. Verify both source items and their six tables before deploying downstream items.
+1. Create the Databricks and ADLS Fabric connections. Grant the selected Databricks identity only `USE CATALOG`, `USE SCHEMA`, `EXTERNAL USE SCHEMA`, and `SELECT` on the three source tables. This integration is metadata sync plus zero-copy shortcuts.
+2. In **Manage connections and gateways**, create the private Azure Cosmos DB v2 connection on the VNet data gateway using OAuth 2.0. The mirror itself must be created with REST because the current portal mirror wizard can't select a VNet gateway connection.
+3. Set the three connection IDs in ignored `.env`, then run `python infra\fabric\source_mirrors.py`. It idempotently creates/updates `databricks_bronze`, creates `cosmos_bronze`, and starts Cosmos replication.
+4. Verify both source items and their six tables before deploying downstream items.
 
 Databricks external data access and the private Cosmos network path must be verified first. The private Cosmos OAuth connection is created interactively in **Manage connections and gateways**; the mirror that references it is created with REST. Do not fabricate item IDs in `.env` to bypass either source.
 
@@ -110,7 +111,7 @@ Execute Warehouse scripts in numeric order as documented in `warehouse/README.md
 
 ## 8. Connect Fabric Git
 
-From workspace settings, connect the new workspace to the intended GitHub repository/branch and `/fabric_git` directory. Only a workspace admin can manage the connection. Review the proposed synchronization before committing because Fabric can overwrite item-definition folder contents. Confirm supported items appear; unsupported items must be documented rather than claimed.
+Supply a short-lived, repository-scoped fine-grained PAT through the process environment only, then run `python -m infra.fabric.git_integration`. The OAuth token returned by `gh auth token` is not a PAT and Fabric rejects it. The script stores the credential in a Fabric connection, connects the workspace to the intended GitHub repository/branch and `/fabric_git` directory, and performs the one-time initialization. Existing connections require `--reuse-existing-connection` after their repository URL and stored credential are verified. If Fabric requires Git-to-workspace initialization, inspect the branch/directory first and explicitly pass `--allow-update-from-git`; the default refuses that potentially overwriting direction. Only a workspace admin can manage the connection. Confirm supported items appear; unsupported items must be documented rather than claimed.
 
 Follow the current [Fabric Git integration process](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-integration-process). The connection and synchronization are not yet verified in this POC.
 

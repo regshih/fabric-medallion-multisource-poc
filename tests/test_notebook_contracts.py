@@ -26,6 +26,16 @@ def test_all_expected_notebooks_are_valid_python():
         ast.parse(source(name), filename=name)
 
 
+def test_notebooks_include_fabric_kernel_and_cell_metadata():
+    for name in NAMES:
+        text = source(name)
+        assert '"name": "synapse_pyspark"' in text
+        assert text.count("# METADATA ********************") >= 3
+        assert '"language_group": "synapse_pyspark"' in text
+        assert "# PARAMETERS CELL ********************\n\n" in text
+        assert "# CELL ********************\n\n" in text
+
+
 def test_notebooks_use_deploy_time_parameters_and_no_embedded_guids():
     guid = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b", re.I)
     for name in NAMES:
@@ -52,6 +62,7 @@ def test_core_contracts_are_present():
     source_validation = source("nb_source_validation.py")
     assert 'source = "all"' in source_validation
     assert '{"all", "databricks", "cosmos"}' in source_validation
+    assert 'STAGE = f"source_validation_{source}"' in source_validation
 
 
 def test_pipeline_logging_and_warehouse_contracts():

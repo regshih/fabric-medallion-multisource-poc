@@ -41,7 +41,9 @@
             "source": {"value": "databricks", "type": "string"}
             ,"workspace_id": {"value": "{{WORKSPACE_ID}}", "type": "string"}
             ,"databricks_source_lakehouse_id": {"value": "{{ITEM_ID:databricks_source}}", "type": "string"}
+            ,"databricks_source_schema": {"value": "{{ITEM_NAME:databricks_schema}}", "type": "string"}
             ,"cosmos_source_lakehouse_id": {"value": "{{ITEM_ID:cosmos_source}}", "type": "string"}
+            ,"cosmos_source_schema": {"value": "{{ITEM_NAME:cosmos_schema}}", "type": "string"}
             ,"audit_lakehouse_id": {"value": "{{ITEM_ID:audit_lh}}", "type": "string"}
           }
         }
@@ -60,7 +62,9 @@
             "source": {"value": "cosmos", "type": "string"}
             ,"workspace_id": {"value": "{{WORKSPACE_ID}}", "type": "string"}
             ,"databricks_source_lakehouse_id": {"value": "{{ITEM_ID:databricks_source}}", "type": "string"}
+            ,"databricks_source_schema": {"value": "{{ITEM_NAME:databricks_schema}}", "type": "string"}
             ,"cosmos_source_lakehouse_id": {"value": "{{ITEM_ID:cosmos_source}}", "type": "string"}
+            ,"cosmos_source_schema": {"value": "{{ITEM_NAME:cosmos_schema}}", "type": "string"}
             ,"audit_lakehouse_id": {"value": "{{ITEM_ID:audit_lh}}", "type": "string"}
           }
         }
@@ -81,7 +85,9 @@
             "run_date": {"value": "@if(equals(pipeline().parameters.run_date, ''), formatDateTime(utcnow(), 'yyyy-MM-dd'), pipeline().parameters.run_date)", "type": "string"}
             ,"workspace_id": {"value": "{{WORKSPACE_ID}}", "type": "string"}
             ,"databricks_source_lakehouse_id": {"value": "{{ITEM_ID:databricks_source}}", "type": "string"}
+            ,"databricks_source_schema": {"value": "{{ITEM_NAME:databricks_schema}}", "type": "string"}
             ,"cosmos_source_lakehouse_id": {"value": "{{ITEM_ID:cosmos_source}}", "type": "string"}
+            ,"cosmos_source_schema": {"value": "{{ITEM_NAME:cosmos_schema}}", "type": "string"}
             ,"silver_lakehouse_id": {"value": "{{ITEM_ID:silver_lh}}", "type": "string"}
             ,"audit_lakehouse_id": {"value": "{{ITEM_ID:audit_lh}}", "type": "string"}
           }
@@ -137,7 +143,9 @@
             "run_date": {"value": "@if(equals(pipeline().parameters.run_date, ''), formatDateTime(utcnow(), 'yyyy-MM-dd'), pipeline().parameters.run_date)", "type": "string"}
             ,"workspace_id": {"value": "{{WORKSPACE_ID}}", "type": "string"}
             ,"databricks_source_lakehouse_id": {"value": "{{ITEM_ID:databricks_source}}", "type": "string"}
+            ,"databricks_source_schema": {"value": "{{ITEM_NAME:databricks_schema}}", "type": "string"}
             ,"cosmos_source_lakehouse_id": {"value": "{{ITEM_ID:cosmos_source}}", "type": "string"}
+            ,"cosmos_source_schema": {"value": "{{ITEM_NAME:cosmos_schema}}", "type": "string"}
             ,"silver_lakehouse_id": {"value": "{{ITEM_ID:silver_lh}}", "type": "string"}
             ,"gold_lakehouse_id": {"value": "{{ITEM_ID:gold_lh}}", "type": "string"}
             ,"audit_lakehouse_id": {"value": "{{ITEM_ID:audit_lh}}", "type": "string"}

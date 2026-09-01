@@ -1,12 +1,29 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 pipeline_run_id = "manual"
 run_date = ""
 workspace_id = ""
 gold_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 from pyspark.sql import functions as F
 
 if not workspace_id or not gold_lakehouse_id:
@@ -44,3 +61,9 @@ alert_drillthrough = (gold("FactFraudAlerts").alias("a")
     .orderBy(F.desc("CreatedTimestamp")))
 alert_drillthrough.show(25, truncate=False)
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

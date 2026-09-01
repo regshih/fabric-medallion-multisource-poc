@@ -1,5 +1,6 @@
 -- Run as a Unity Catalog metastore admin only when a dedicated catalog is needed.
--- No external location or credential is embedded; all tables are managed.
+-- External location and credential names are injected by deployment; source
+-- tables are external Delta so Fabric can read them through OneLake shortcuts.
 CREATE CATALOG IF NOT EXISTS fabric_multisource_poc
   COMMENT 'Synthetic multisource Fabric medallion POC';
 

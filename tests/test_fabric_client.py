@@ -115,6 +115,13 @@ def test_wait_for_operation_returns_result():
     assert session.calls[-1][1] == "https://result"
 
 
+def test_wait_for_operation_returns_terminal_body_when_action_has_no_result():
+    api, session, _ = client([Response(200, {"status": "Succeeded"})])
+    initial = Response(202, None, {"Location": "https://operation"})
+    assert api.wait_for_operation(initial, timeout=10) == {"status": "Succeeded"}
+    assert len(session.calls) == 1
+
+
 def test_wait_for_operation_is_bounded():
     clock = Clock()
     api, _, _ = client([Response(200, {"status": "Running"})] * 3, clock)

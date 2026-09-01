@@ -1,11 +1,11 @@
 # Known limitations and findings
 
-## Current blockers
+## Current findings
 
-- Databricks source execution and table counts must be verified before the Fabric catalog mirror is accepted. Metastore external data access is enabled.
-- Cosmos stays private-only. The private endpoint, DNS, gateway subnet, NAT, Fabric VNet data gateway, and workspace ACL prerequisites are deployed; an authorized user must complete the OAuth 2.0 connection handshake in Fabric before REST can create the mirror.
+- Databricks external Delta tables, Fabric shortcuts, initial counts, and deterministic incremental changes are verified. Unity Catalog permissions still don't transfer to Fabric.
+- The Cosmos private path is verified end to end: private endpoint, DNS, Fabric VNet data gateway, workspace ACL, OAuth connection, initial mirroring, and deterministic incremental changes. Public fallback wasn't used; this evidence does not claim the account's public-network setting was disabled afterward.
 - The checked-in Cosmos Bicep now matches the deployed serverless/private-network source posture.
-- Fabric source items, downstream items, pipeline execution, Warehouse serving, Git synchronization, Catalog/governance, security enforcement, and incremental propagation haven't yet been verified.
+- Fabric source items, downstream medallion processing, baseline reconciliation, Warehouse serving, RLS/DDM metadata, Catalog descriptions/search, and incremental source propagation are verified. Git synchronization and least-privileged end-user enforcement remain to be completed.
 
 ## Product limitations affecting the design
 
@@ -46,4 +46,4 @@ Sources: [tutorial](https://learn.microsoft.com/en-us/fabric/mirroring/azure-cos
 
 ## Documentation freshness
 
-Fabric mirroring, networking, Git, and security limitations change. Recheck every linked Microsoft Learn page before production adoption or a later demo. The statements here were reviewed on 2026-08-31.
+Fabric mirroring, networking, Git, and security limitations change. Recheck every linked Microsoft Learn page before production adoption or a later demo. The statements here were reviewed on 2026-09-01.

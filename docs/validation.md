@@ -16,19 +16,19 @@ Never infer `Verified` from `Deployed`, or successful mirroring from a source re
 
 | Check | Status | Evidence/next action |
 |---|---|---|
-| Local unit/contract tests | Verified | 39 passed on 2026-08-31 |
+| Local unit/contract tests | Verified | 47 passed on 2026-09-01 |
 | Azure resource group | Deployed | Do not publish IDs |
-| Premium Databricks workspace | Deployed | Seed job currently running |
-| Databricks tables/counts | Not verified | Wait for job, validate schema/counts |
+| Premium Databricks workspace | Verified | Premium workspace and single-node job execution succeeded |
+| Databricks tables/counts | Verified | Initial 500,000 transactions/risk rows and 5,000 merchants; incremental 510,000/510,000/5,001 visible through Fabric shortcuts |
 | Databricks metastore external access | Verified | Enabled by metastore administrator |
 | Cosmos serverless account/database/containers | Deployed | `Continuous7Days`; three `/customerId` containers |
-| Cosmos source records | Not recorded as verified | Run live validation and capture redacted result |
-| Cosmos Fabric connectivity | Partially deployed | Private endpoint, DNS, VNet gateway, NAT, and ACL prerequisites exist; OAuth connection remains |
-| Fabric workspace on reused F4 | Deployed | Workspace/item inventory still required |
-| Databricks/Cosmos Fabric source items | Not verified | Create/query after blockers clear |
-| Silver/Gold/pipeline/Warehouse | Not verified | Deploy, execute, capture run results |
-| Governance/Catalog/Git | Not verified | Apply/test with appropriate identities |
-| Incremental propagation | Not verified | Run only after initial baseline |
+| Cosmos source records | Verified | Initial 10,000 sessions, 5,000 devices, and 1,000 alerts; incremental insert/update batch loaded passwordlessly |
+| Cosmos Fabric connectivity | Verified | Private endpoint and Fabric VNet data gateway OAuth path; public fallback wasn't used |
+| Fabric workspace on reused F4 | Verified | Dedicated workspace inventory and deployed items queried through REST |
+| Databricks/Cosmos Fabric source items | Verified | Both source items running; SQL and Spark access paths returned expected counts |
+| Silver/Gold/pipeline/Warehouse | Verified baseline | All seven reconciliations pass, six quarantine tables are empty, serving counts match, two DDM masks and RLS policy are present |
+| Governance/Catalog/Git | Partial | Descriptions, Catalog discovery, and OneLake role applied; least-privileged user tests and Fabric Git PAT connection remain |
+| Incremental propagation | Verified | Insert and update changes reached Silver, Gold, reconciliation, and Warehouse with expected counts |
 
 ## Local checks
 

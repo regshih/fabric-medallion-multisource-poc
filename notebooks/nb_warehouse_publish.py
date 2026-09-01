@@ -1,6 +1,15 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 pipeline_run_id = "manual"
 run_date = ""
 workspace_id = ""
@@ -9,7 +18,15 @@ gold_lakehouse_name = ""
 warehouse_name = "gold_wh"
 audit_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 """Prepare the Warehouse materialization contract.
 
 Fabric Spark sessions do not provide a supported, identity-safe way to execute
@@ -79,3 +96,9 @@ else:
 print(f"Prepared {len(contract_rows)} idempotent CTAS statements for Warehouse '{warehouse_name}'.")
 print("Execution status is PendingExecution until the Warehouse-connected pipeline Script activity runs them.")
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

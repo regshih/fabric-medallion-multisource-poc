@@ -1,16 +1,35 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   }
+# META }
+
 # PARAMETERS CELL ********************
+
 pipeline_run_id = "manual"
 run_date = ""
 workspace_id = ""
 databricks_source_lakehouse_id = ""
+databricks_source_schema = ""
 cosmos_source_lakehouse_id = ""
+cosmos_source_schema = ""
 silver_lakehouse_id = ""
 gold_lakehouse_id = ""
 audit_lakehouse_id = ""
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
+
 from datetime import datetime, timezone
 from delta.tables import DeltaTable
 from pyspark.sql import Row
@@ -19,7 +38,7 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType, Tim
 
 STAGE = "reconciliation"
 _started = datetime.now(timezone.utc)
-for _name in ("workspace_id", "databricks_source_lakehouse_id", "cosmos_source_lakehouse_id",
+for _name in ("workspace_id", "databricks_source_lakehouse_id", "databricks_source_schema", "cosmos_source_lakehouse_id", "cosmos_source_schema",
               "silver_lakehouse_id", "gold_lakehouse_id", "audit_lakehouse_id"):
     if not str(globals()[_name]).strip():
         raise ValueError(f"Required deployment parameter is empty: {_name}")
@@ -36,8 +55,9 @@ def read(lakehouse_id, table_name):
 rows = []
 
 
-def compare(source, obj, source_lh, silver_name, gold_name=None):
-    source_count = read(source_lh, obj).count()
+def compare(source, obj, source_lh, silver_name, gold_name=None, source_schema=""):
+    source_object = f"{source_schema}/{obj}" if source_schema else obj
+    source_count = read(source_lh, source_object).count()
     silver_count = read(silver_lakehouse_id, silver_name).count()
     gold_count = read(gold_lakehouse_id, gold_name).count() if gold_name else None
     quarantine_name = "quarantine_" + silver_name
@@ -50,12 +70,12 @@ def compare(source, obj, source_lh, silver_name, gold_name=None):
 
 
 try:
-    compare("databricks", "transactions", databricks_source_lakehouse_id, "transactions", "FactTransactions")
-    compare("databricks", "transaction_risk", databricks_source_lakehouse_id, "transaction_risk")
-    compare("databricks", "merchants", databricks_source_lakehouse_id, "merchants", "DimMerchant")
-    compare("cosmos", "digitalSessions", cosmos_source_lakehouse_id, "sessions", "FactDigitalSessions")
-    compare("cosmos", "devices", cosmos_source_lakehouse_id, "devices", "DimDevice")
-    compare("cosmos", "fraudAlerts", cosmos_source_lakehouse_id, "fraud_alerts", "FactFraudAlerts")
+    compare("databricks", "transactions", databricks_source_lakehouse_id, "transactions", "FactTransactions", databricks_source_schema)
+    compare("databricks", "transaction_risk", databricks_source_lakehouse_id, "transaction_risk", source_schema=databricks_source_schema)
+    compare("databricks", "merchants", databricks_source_lakehouse_id, "merchants", "DimMerchant", databricks_source_schema)
+    compare("cosmos", "digitalSessions", cosmos_source_lakehouse_id, "sessions", "FactDigitalSessions", cosmos_source_schema)
+    compare("cosmos", "devices", cosmos_source_lakehouse_id, "devices", "DimDevice", cosmos_source_schema)
+    compare("cosmos", "fraudAlerts", cosmos_source_lakehouse_id, "fraud_alerts", "FactFraudAlerts", cosmos_source_schema)
 
     alerts = read(silver_lakehouse_id, "fraud_alerts")
     txns = read(silver_lakehouse_id, "transactions").select("TransactionID")
@@ -101,3 +121,9 @@ else:
 if hard_failures:
     raise RuntimeError(error_message)
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
