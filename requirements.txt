@@ -1,0 +1,12 @@
+azure-cosmos>=4.9,<5
+azure-identity>=1.24,<2
+azure-mgmt-cosmosdb>=9.8,<10
+azure-mgmt-resource>=24,<25
+databricks-sdk>=0.63,<1
+faker>=37,<38
+ms-fabric-cli>=1.2,<2
+numpy>=2.2,<3
+pandas>=2.3,<3
+pytest>=8.4,<9
+python-dotenv>=1.1,<2
+requests>=2.32,<3

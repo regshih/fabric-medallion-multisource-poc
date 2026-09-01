@@ -1,0 +1,47 @@
+# Local credentials and settings
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx
+*.key
+*.token
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Data, generated output, logs, and notebook output
+data/
+output/
+artifacts/
+logs/
+*.log
+*.csv
+*.jsonl
+*.parquet
+*.delta
+.ipynb_checkpoints/
+
+# Azure / Databricks / Fabric local state
+.azure/
+.databricks/
+.fabric/
+terraform.tfstate*
+*.tfvars
+!*.tfvars.example
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Fabric Git artifacts are intentionally tracked under fabric_git/
+fabric_git/.cache/
