@@ -1,12 +1,25 @@
 [CmdletBinding()]
 param(
     [switch]$ReuseExistingConnection,
-    [switch]$AllowUpdateFromGit
+    [switch]$AllowUpdateFromGit,
+    [switch]$FromClipboard
 )
 
 $ErrorActionPreference = 'Stop'
-$securePat = Read-Host 'Paste the GitHub personal access token' -AsSecureString
-$env:GITHUB_PAT = [System.Net.NetworkCredential]::new('', $securePat).Password
+$securePat = $null
+if ($FromClipboard) {
+    $clipboardPat = (Get-Clipboard -Raw).Trim()
+    if (-not $clipboardPat) {
+        throw 'The clipboard is empty. Copy the generated PAT value, then rerun.'
+    }
+    $env:GITHUB_PAT = $clipboardPat
+    $clipboardPat = $null
+    Set-Clipboard -Value ''
+}
+else {
+    $securePat = Read-Host 'Paste the GitHub personal access token' -AsSecureString
+    $env:GITHUB_PAT = [System.Net.NetworkCredential]::new('', $securePat).Password
+}
 $env:FABRIC_WORKSPACE_NAME = 'fabric-medallion-multisource-poc'
 $env:GITHUB_OWNER = 'regshih'
 $env:GITHUB_REPOSITORY = 'fabric-medallion-multisource-poc'
@@ -29,5 +42,7 @@ try {
 }
 finally {
     Remove-Item Env:\GITHUB_PAT -ErrorAction SilentlyContinue
-    $securePat.Dispose()
+    if ($null -ne $securePat) {
+        $securePat.Dispose()
+    }
 }
