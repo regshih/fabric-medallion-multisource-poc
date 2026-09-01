@@ -14,7 +14,9 @@ if ($FromClipboard) {
     }
     $env:GITHUB_PAT = $clipboardPat
     $clipboardPat = $null
-    Set-Clipboard -Value ''
+    # Windows PowerShell 5 rejects an empty string; one blank character still
+    # removes the credential from the clipboard without retaining its value.
+    Set-Clipboard -Value ' '
 }
 else {
     $securePat = Read-Host 'Paste the GitHub personal access token' -AsSecureString
