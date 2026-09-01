@@ -5,7 +5,7 @@
 - Databricks external Delta tables, Fabric shortcuts, initial counts, and deterministic incremental changes are verified. Unity Catalog permissions still don't transfer to Fabric.
 - The Cosmos private path is verified end to end: private endpoint, DNS, Fabric VNet data gateway, workspace ACL, OAuth connection, initial mirroring, and deterministic incremental changes. Public fallback wasn't used; this evidence does not claim the account's public-network setting was disabled afterward.
 - The checked-in Cosmos Bicep now matches the deployed serverless/private-network source posture.
-- Fabric source items, downstream medallion processing, baseline reconciliation, Warehouse serving, RLS/DDM metadata, Catalog descriptions/search, and incremental source propagation are verified. Git synchronization and least-privileged end-user enforcement remain to be completed.
+- Fabric source items, downstream medallion processing, baseline reconciliation, Warehouse serving, Viewer-context Warehouse RLS/DDM, Catalog descriptions/search, and incremental source propagation are verified. Git synchronization and OneLake CLS through SQL user-identity mode remain to be completed.
 
 ## Product limitations affecting the design
 
@@ -40,7 +40,7 @@ Sources: [tutorial](https://learn.microsoft.com/en-us/fabric/mirroring/azure-cos
 - Cosmos seed scale and default 500,000-row Databricks scale don't establish performance, concurrency, skew, recovery, or cost characteristics.
 - The two sources use source-relative 30-day watermarks. This is intentional for asynchronous clocks but differs from a single enterprise as-of timestamp.
 - Warehouse security-bearing objects use local copies because RLS/DDM can't be applied to Lakehouse tables through cross-database views in this design.
-- Administrators can bypass or are unaffected by some controls. Independent least-privileged validation is required.
+- A temporary Viewer identity verified Warehouse DDM and RLS, then its role and credential were removed. The Lakehouse SQL endpoint remained in delegated-identity mode, where OneLake roles aren't the SQL enforcement model; its Viewer query could still read the restricted column. Switching to user identity mode is intentionally left as a documented follow-up because it changes the endpoint security model and can remove inline SQL metadata.
 - The reused F4 may experience contention and can't be paused without considering other workspaces.
 - Disaster recovery, production HA, SLA/SLOs, data retention, formal Purview policy design, semantic model/report deployment, and performance benchmarking are out of scope.
 

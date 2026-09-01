@@ -25,7 +25,7 @@ Status is deliberately separated into local implementation, deployed infrastruct
 | Fabric | Workspace deployed on a reused F4 capacity |
 | Fabric items and source mirrors | Deployed and verified in the dedicated POC workspace |
 | Pipeline, notebooks, Warehouse execution | Baseline run completed; all reconciliation checks pass; Warehouse RLS/DDM deployed |
-| Fabric Git and governance | Catalog descriptions, discovery, OneLake role, Warehouse RLS/DDM verified; Fabric Git and Viewer-context enforcement remain |
+| Fabric Git and governance | Catalog descriptions/discovery and Warehouse Viewer RLS/DDM verified; Fabric Git and OneLake SQL user-identity mode remain |
 | End-to-end and incremental run | Verified; baseline and incremental runs completed with all seven reconciliations passing |
 
 Nothing in this table should be interpreted as a successful Fabric workload run until the validation evidence in [docs/validation.md](docs/validation.md) is completed.

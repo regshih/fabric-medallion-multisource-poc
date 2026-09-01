@@ -27,7 +27,7 @@ Never infer `Verified` from `Deployed`, or successful mirroring from a source re
 | Fabric workspace on reused F4 | Verified | Dedicated workspace inventory and deployed items queried through REST |
 | Databricks/Cosmos Fabric source items | Verified | Both source items running; SQL and Spark access paths returned expected counts |
 | Silver/Gold/pipeline/Warehouse | Verified baseline | All seven reconciliations pass, six quarantine tables are empty, serving counts match, two DDM masks and RLS policy are present |
-| Governance/Catalog/Git | Partial | Descriptions, Catalog discovery, and OneLake role applied; least-privileged user tests and Fabric Git PAT connection remain |
+| Governance/Catalog/Git | Partial | Descriptions/Catalog verified; Viewer Warehouse DDM/RLS verified; OneLake SQL delegated-mode boundary observed; Fabric Git PAT connection remains |
 | Incremental propagation | Verified | Insert and update changes reached Silver, Gold, reconciliation, and Warehouse with expected counts |
 
 ## Local checks
@@ -71,9 +71,9 @@ Capture the Fabric run ID and UTC timestamps, but keep tenant/workspace/resource
 
 ## Security validation
 
-- Test OneLake column restrictions using a Viewer/read-only identity; Admin/Member/Contributor aren't constrained by OneLake data-access roles.
-- Test Warehouse DDM using a least-privileged Viewer without `CONTROL` or `UNMASK`.
-- Test Warehouse RLS with the intended investigator and non-investigator principals.
+- OneLake Viewer test completed: permitted columns were readable, but the restricted column remained readable through the SQL endpoint because it is in delegated-identity mode. Repeat after an explicitly approved switch to user identity mode.
+- Warehouse DDM completed with a temporary Viewer: the customer identifier was masked.
+- Warehouse RLS completed with the same non-investigator Viewer: zero high-risk rows were visible.
 - Confirm Unity Catalog permissions did not implicitly carry into Fabric.
 - Review item sharing, workspace roles, connections, and source credential ownership.
 - Run the public-release secret review described in `SECURITY.md` over both working tree and Git history.

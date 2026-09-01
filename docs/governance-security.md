@@ -29,6 +29,8 @@ These controls are locally implemented but not yet applied or independently veri
 
 Per the [OneLake data security overview](https://learn.microsoft.com/en-us/fabric/onelake/security/fabric-onelake-security), OneLake security roles grant constrained access to Viewers or users with item Read permission. Workspace Admins, Members, and Contributors retain broad item data access and aren't affected by those roles. Enforcement must therefore be tested using a least-privileged identity, not the deployment administrator.
 
+The Lakehouse SQL analytics endpoint also has an access-mode boundary. [Microsoft's SQL endpoint guidance](https://learn.microsoft.com/en-us/fabric/onelake/security/sql-analytics-endpoint-onelake-security) states that OneLake roles are enforced through SQL only in **user identity** mode; the default delegated-identity mode uses SQL permissions and the item owner's OneLake identity instead. This POC applied the OneLake column allowlist but left the endpoint in delegated mode to avoid the documented metadata changes caused by switching modes. A Viewer test consequently confirmed that the SQL endpoint did not enforce that allowlist. Switch deliberately to user identity mode and repeat the Viewer test before claiming SQL-endpoint OneLake CLS enforcement.
+
 The `DefaultReader` role may grant `ReadAll` by default. Review its members and rules before applying the repository helper. The helper performs a full-replace API update safely, but the semantic decision to modify `DefaultReader` still requires an access review.
 
 ## Catalog and lineage
@@ -46,4 +48,3 @@ Do not claim domain assignment, endorsement, sensitivity labels, catalog discove
 The `/fabric_git` folder is reserved for Fabric-managed definitions. Fabric Git isn't a data backup and should never contain notebook output or connection credentials. Follow [Fabric Git integration concepts and limitations](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-integration-process): only supported items sync, a workspace admin manages the connection, synchronization is one direction at a time, and Fabric can remove files within item folders that aren't part of item definitions.
 
 Review the exact workspace diff and run the security gate before every commit from Fabric.
-

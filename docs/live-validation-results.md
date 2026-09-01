@@ -30,10 +30,11 @@ Databricks values are two query paths over the same external Delta data through 
 - Warehouse zero-copy views and security-bearing local copies returned the incremental counts above.
 - Two dynamic data masks are present on the local customer/device copies.
 - The customer-risk security policy is enabled and schema-bound.
+- A temporary Viewer identity observed a masked customer ID and zero visible high-risk rows; its workspace assignment and short-lived credential were removed immediately afterward.
 - The Gold OneLake `DefaultReader` role replacement passed the server dry run and was applied with ETag concurrency protection while preserving existing roles/rules.
 - Catalog descriptions were applied and OneLake Catalog discovery returned the POC items.
 
 ## Remaining user-context checks
 
-- DDM and OneLake column restrictions still require a Viewer/read-only identity to prove the non-admin experience; an Admin result cannot establish enforcement.
+- The OneLake allowlist wasn't enforced through the Lakehouse SQL endpoint while it remained in delegated-identity mode: the temporary Viewer could read the restricted column. Per the [documented SQL endpoint access modes](https://learn.microsoft.com/en-us/fabric/onelake/security/sql-analytics-endpoint-onelake-security), SQL enforcement of OneLake roles requires user identity mode. That security-model switch wasn't made because it can remove inline SQL metadata; it remains an explicit follow-up rather than a successful claim.
 - Fabric Git requires a classic or fine-grained GitHub PAT. GitHub CLI OAuth tokens are rejected by Fabric, so Git initialization remains pending that short-lived credential.
