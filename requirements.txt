@@ -8,6 +8,6 @@ ms-fabric-cli>=1.2,<2
 numpy>=2.2,<3
 pandas>=2.3,<3
 pyodbc>=5.2,<6
-pytest>=8.4,<9
+pytest>=9.2.0,<10
 python-dotenv>=1.1,<2
 requests>=2.32,<3
