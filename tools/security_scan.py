@@ -14,6 +14,10 @@ SELF = Path(__file__).resolve()
 DOCUMENTED_EXAMPLE = (ROOT / "SECURITY.md").resolve()
 SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".pyc"}
 PATTERNS = {
+    "azure-resource-inventory": re.compile(r"/subscriptions/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/", re.I),
+    "fabric-workspace-inventory": re.compile(r"https://app\.fabric\.microsoft\.com/groups/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/", re.I),
+    "fabric-host-inventory": re.compile(r"https://[a-z0-9.-]+\.(?:webapp\.fabricapps\.net|datawarehouse\.fabric\.microsoft\.com)\b", re.I),
+    "tenant-user-inventory": re.compile(r"\b[a-z0-9._%+-]+@[a-z0-9-]+\.onmicrosoft\.com\b", re.I),
     "azure-storage-key": re.compile(r"AccountKey=[A-Za-z0-9+/]{32,}={0,2}", re.I),
     "sas-signature": re.compile(r"(?:[?&;]|^)sig=[A-Za-z0-9%+/]{20,}", re.I),
     "github-token": re.compile(r"\bgh(?:p|o|u|s|r)_[A-Za-z0-9]{20,}\b"),

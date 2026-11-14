@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "outDir": ".temp/compiled",
+    "rootDir": "."
+  },
+  "include": ["data/**/*.ts", "connectors/**/*.ts"],
+  "exclude": [".temp"]
+}

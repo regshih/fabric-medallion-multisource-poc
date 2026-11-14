@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.env.local
+.env.*.local
+rayfin/.env
+rayfin/.env.*
+rayfin/.deployments.json
+rayfin/.temp/
+rayfin/.lockfile.json
+.local/
+*.tsbuildinfo
+
+# Parent repository ignores all data/ folders; these are source code.
+!rayfin/data/
+!rayfin/data/**

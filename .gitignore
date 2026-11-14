@@ -7,6 +7,9 @@
 *.key
 *.token
 
+# Node.js / frontend tooling
+node_modules/
+
 # Python
 __pycache__/
 *.py[cod]

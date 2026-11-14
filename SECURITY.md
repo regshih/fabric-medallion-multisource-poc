@@ -22,4 +22,6 @@ Every customer, account, transaction, device, session, merchant, IP address, and
 
 ## Reporting
 
-If a credential is found, do not open a public issue containing it. Revoke it and remove it locally before reporting the affected file path to the repository owner.
+Report vulnerabilities through [GitHub private vulnerability reporting](https://github.com/regshih/fabric-medallion-multisource-poc/security/advisories/new). Do not post credentials, exploit details, environment inventory or personal data in a public issue or pull request. If a credential is exposed, revoke it promptly and report affected file paths without including the value.
+
+This POC has no production support SLA. Security fixes target the current default branch; older snapshots are not maintained. GitHub secret scanning, push protection, Dependabot security updates and private reporting are enabled. These controls complement manual review and the local release gate; they do not guarantee that every secret or vulnerability will be detected.

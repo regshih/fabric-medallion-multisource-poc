@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.local/
+rayfin/.temp/
+package-lock.json
+scripts/__pycache__/
