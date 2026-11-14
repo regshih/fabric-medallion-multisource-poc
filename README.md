@@ -1,5 +1,13 @@
 # Microsoft Fabric multisource medallion POC
 
+## Fabric App extension — Signal
+
+The additive [Signal Fabric Risk Workbench](fabric-app/README.md) turns the existing Fabric Gold customer-risk model into searchable customer investigations, notes, assignment labels and status workflows. It uses React, TypeScript and Microsoft's Rayfin SDK. Gold remains in Fabric; the existing Databricks/Cosmos sources, notebooks and pipelines are preserved. A labeled local synthetic demo runs without cloud provisioning. The delegated, read-only live Warehouse connector and app-owned workflow store were deployed and verified in an approved development environment; deploy your own instance using the guide below.
+
+Start with the [app setup](fabric-app/README.md), [architecture](fabric-app/docs/ARCHITECTURE.md), [deployment guide](fabric-app/docs/DEPLOYMENT.md), [customer walkthrough](fabric-app/docs/DEMO.md), and [validation boundaries](fabric-app/docs/VALIDATION.md).
+
+## Existing medallion platform
+
 This proof of concept combines synthetic Azure Databricks transaction data with synthetic Azure Cosmos DB digital-behavior data in Microsoft Fabric. It demonstrates source-native integration, substantive Silver quality processing, a cross-source Gold fraud-risk model, Warehouse serving, pipeline observability, and governance automation.
 
 The key architectural point is that the two source integrations are intentionally different:
@@ -56,6 +64,7 @@ Gold also contains:
 | `warehouse/` | Gold serving, RLS, masking, and validation SQL |
 | `validation/`, `tests/` | Offline/live validators and local tests |
 | `fabric_git/` | Dedicated target for Fabric-managed Git artifacts |
+| `fabric-app/` | Signal React/TypeScript app, local demo, Rayfin models and deployment guide |
 
 ## Quick start
 
@@ -87,6 +96,10 @@ All records are deterministic synthetic test data. No production data or real-pe
 - [Live validation results](docs/live-validation-results.md)
 - [Governance and security model](docs/governance-security.md)
 - [Known limitations](docs/known-limitations.md)
+
+## Contributing and license
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local checks and pull request guidance, [SECURITY.md](SECURITY.md) to report a vulnerability privately, and [LICENSE](LICENSE) for the MIT license. Third-party components retain their respective licenses. This is an independent sample, not an official Microsoft product or support commitment.
 
 ## Official documentation
 

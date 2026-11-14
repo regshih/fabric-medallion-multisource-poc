@@ -1,0 +1,36 @@
+id: signal-risk-workbench
+name: signal-risk-workbench
+version: 1.0.0
+services:
+  auth:
+    enabled: true
+    fabric:
+      enabled: true
+    password:
+      enabled: false
+    allowedRedirectUris:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+  data:
+    enabled: true
+    dialect: mssql
+  staticHosting:
+    enabled: true
+    folder: dist
+    buildCommand: npm run build
+    indexDocument: index.html
+    assetAccess: protected
+  storage:
+    enabled: false
+  functions:
+    enabled: false
+connectors:
+  - name: gold
+    type: fabric-warehouse
+    config:
+      workspaceId: ${GOLD_WORKSPACE_ID}
+      itemId: ${GOLD_WAREHOUSE_ID}
+    auth:
+      type: delegated
+    operations:
+      - name: read

@@ -1,0 +1,37 @@
+name: validate-fabric-app
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: fabric-app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: fabric-app/package-lock.json
+      - run: npm ci --no-fund
+      - run: npm run check
+      - run: npm run schema:check
+      - run: npm run fabric:validate
+      - run: npm audit --audit-level=high
+      - name: Build live mode with public placeholders only
+        env:
+          VITE_DATA_MODE: live
+          VITE_RAYFIN_API_URL: https://approved-app.example.test
+          VITE_RAYFIN_PUBLISHABLE_KEY: pk-example
+          VITE_FABRIC_WORKSPACE_ID: 00000000-0000-4000-8000-000000000001
+          VITE_FABRIC_ITEM_ID: 00000000-0000-4000-8000-000000000002
+        run: npm run build
+# No login, secrets, source SQL or deployment step is included.
